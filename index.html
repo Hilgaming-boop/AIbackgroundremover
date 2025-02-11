@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Background Remover</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, s28a745ans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #0d1a6aff, #691596ff);
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        input {
+            display: none;
+        }
+
+        .upload-label {
+            display: block;
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .upload-label:hover {
+            background: #0056b3;
+        }
+
+        button {
+            background: #071c98;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .image-container img {
+            max-width: 45%;
+            border-radius: 5px;
+            display: none;
+        }
+
+        #download {
+            display: none;
+            margin-top: 10px;
+            background: #464ce2;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        #download:hover {
+            background: #e0a800;
+        }
+    </style>
+</head>
+<body>
+    <h1> AI BG Remover</h1>
+    <div class="container">
+        <label for="upload" class="upload-label">Chose Image</label>
+        <input type="file" id="upload" accept="image/*" onchange="previewImage()">
+        <button onclick="removeBackground()">Remove BG</button>
+
+        <div class="image-container">
+            <img id="original-preview">
+            <img id="processed-preview">
+        </div>
+
+        <a id="download">download image</a>
+    </div>
+
+    <script>
+        function previewImage() {
+            let input = document.getElementById('upload');
+            let file = input.files[0];
+
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let img = document.getElementById("original-preview");
+                    img.src = e.target.result;
+                    img.style.display = "block";
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function removeBackground() {
+            let input = document.getElementById('upload');
+            let file = input.files[0];
+
+            if (!file) {
+                alert("Please select an image first !");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("image_file", file);
+            formData.append("size", "auto");
+
+            try {
+                let response = await fetch("https://api.remove.bg/v1.0/removebg", {
+                    method: "POST",
+                    headers: {
+                        "X-Api-Key": "AzA85zoKXq272vpn1S1TN3uF"
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    alert("Erro ao remover fundo! Verifique sua API Key.");
+                    return;
+                }
+
+                let blob = await response.blob();
+                let url = URL.createObjectURL(blob);
+
+                let processedImg = document.getElementById("processed-preview");
+                processedImg.src = url;
+                processedImg.style.display = "block";
+
+                let downloadLink = document.getElementById("download");
+                downloadLink.href = url;
+                downloadLink.download = "imagem_sem_fundo.png";
+                downloadLink.textContent = "Download image";
+                downloadLink.style.display = "block";
+
+            } catch (error) {
+                console.error("Erro:", error);
+                alert("Something went wrong, please try again later!");
+            }
+        }
+    </script>
+</body>
+</html>

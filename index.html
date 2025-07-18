@@ -1,183 +1,102 @@
-<!DOCTYPE html>
-<html lang="pt">
+<!DOCTYPE html><html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Background Remover</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, s28a745ans-serif;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #0d1a6aff, #691596ff);
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-        }
-
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-
-        input {
-            display: none;
-        }
-
-        .upload-label {
-            display: block;
-            background: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: 0.3s;
-        }
-
-        .upload-label:hover {
-            background: #0056b3;
-        }
-
-        button {
-            background: #071c98;
-            border: none;
-            padding: 10px 20px;
-            color: white;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: #218838;
-        }
-
-        .image-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .image-container img {
-            max-width: 45%;
-            border-radius: 5px;
-            display: none;
-        }
-
-        #download {
-            display: none;
-            margin-top: 10px;
-            background: #464ce2;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            color: black;
-            font-weight: bold;
-        }
-
-        #download:hover {
-            background: #e0a800;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HilGaming Mods</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <h1> AI BG Remover</h1>
-    <div class="container">
-        <label for="upload" class="upload-label">Chose Image</label>
-        <input type="file" id="upload" accept="image/*" onchange="previewImage()">
-        <button onclick="removeBackground()">Remove BG</button>
+  <header>
+    <h1>HilGaming MODs</h1>
+    <input type="text" id="search" placeholder="Pesquisar mods...">
+  </header>  <main id="posts"></main>  <script>
+    const mods = [
+      {
+        title: "Efootball 26 MOD FIFA 16",
+        images: [
+          "https://i.postimg.cc/fyHXpR7p/Screenshot-20250715-113322-You-Tube.png",
+          "https://i.postimg.cc/tCTFPFpj/Screenshot-20250715-112918-You-Tube.png",
+          "https://i.postimg.cc/v8XWc0Rh/Screenshot-20250715-112855-You-Tube.png"
+        ],
+        video: "https://www.youtube.com/embed/N7UE9TwTYLc?autoplay=1&mute=1",
+        download: "https://gplinks.co/Efootball26"
+      },
+      {
+        title: "FTS 25 MOD EA SPORTS FC MOBILE",
+        images: [
+          "https://i.postimg.cc/sg47f4FR/Video-Capture-20250714-150756.jpg",
+          "https://i.postimg.cc/rFW53LQs/Video-Capture-20250714-150747.jpg",
+          "https://i.postimg.cc/440KXFmc/20250713-182955.png"
+        ],
+        video: "https://www.youtube.com/embed/QtL4rI23zEc?autoplay=1&mute=1",
+        download: "https://gplinks.co/a0DVSR"
+      },
+      {
+        title: "FIFA 16 MOD UFL 26 ANDROID",
+        images: [
+          "https://i.postimg.cc/MGc1Khn1/Screenshot-20250713-170107-You-Tube.png",
+          "https://i.postimg.cc/YCC1T4kn/Screenshot-20250713-170045-You-Tube.png",
+          "https://i.postimg.cc/9FpdxP3w/Screenshot-20250713-165954-You-Tube.png"
+        ],
+        video: "https://www.youtube.com/embed/mPhT1b5a2kE?autoplay=1&mute=1",
+        download: "https://gplinks.co/diwehZ"
+      }
+    ];
 
-        <div class="image-container">
-            <img id="original-preview">
-            <img id="processed-preview">
+    const container = document.getElementById('posts');
+
+    function createPost(mod) {
+      return `
+      <section class="post">
+        <h2>${mod.title}</h2>
+        <div class="slideshow">
+          ${mod.images.map(img => `<img src="${img}" alt="${mod.title}">`).join('')}
         </div>
+        <iframe src="${mod.video}" frameborder="0" allowfullscreen></iframe>
+        <div class="countdown-box">
+          <button onclick="startCountdown('${mod.download}', this)">Baixar MOD</button>
+        </div>
+      </section>`;
+    }
 
-        <a id="download">download image</a>
-    </div>
+    function loadPosts() {
+      container.innerHTML = mods.map(createPost).join('');
+    }
 
-    <script>
-        function previewImage() {
-            let input = document.getElementById('upload');
-            let file = input.files[0];
-
-            if (file) {
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    let img = document.getElementById("original-preview");
-                    img.src = e.target.result;
-                    img.style.display = "block";
-                }
-                reader.readAsDataURL(file);
-            }
+    function startCountdown(url, btn) {
+      let time = 60;
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      const interval = setInterval(() => {
+        if (time > 0) {
+          btn.textContent = `Espere ${time--}s...`;
+        } else {
+          clearInterval(interval);
+          window.open(url, '_blank');
+          btn.textContent = originalText;
+          btn.disabled = false;
         }
+      }, 1000);
+    }
 
-        async function removeBackground() {
-            let input = document.getElementById('upload');
-            let file = input.files[0];
+    document.getElementById('search').addEventListener('input', function () {
+      const q = this.value.toLowerCase();
+      const filtered = mods.filter(m => m.title.toLowerCase().includes(q));
+      container.innerHTML = filtered.map(createPost).join('');
+    });
 
-            if (!file) {
-                alert("Please select an image first !");
-                return;
-            }
-
-            let formData = new FormData();
-            formData.append("image_file", file);
-            formData.append("size", "auto");
-
-            try {
-                let response = await fetch("https://api.remove.bg/v1.0/removebg", {
-                    method: "POST",
-                    headers: {
-                        "X-Api-Key": "AzA85zoKXq272vpn1S1TN3uF"
-                    },
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    alert("Erro ao remover fundo! Verifique sua API Key.");
-                    return;
-                }
-
-                let blob = await response.blob();
-                let url = URL.createObjectURL(blob);
-
-                let processedImg = document.getElementById("processed-preview");
-                processedImg.src = url;
-                processedImg.style.display = "block";
-
-                let downloadLink = document.getElementById("download");
-                downloadLink.href = url;
-                downloadLink.download = "imagem_sem_fundo.png";
-                downloadLink.textContent = "Download image";
-                downloadLink.style.display = "block";
-
-            } catch (error) {
-                console.error("Erro:", error);
-                alert("Something went wrong, please try again later!");
-            }
-        }
-    </script>
-</body>
+    Telegram.WebApp.expand();
+    loadPosts();
+  </script>  <style>
+    body { font-family: sans-serif; margin: 0; background: #f4f4f4; color: #333; }
+    header { padding: 1em; background: #111; color: #fff; text-align: center; }
+    input[type="text"] { width: 90%; padding: 0.5em; margin-top: 0.5em; border-radius: 5px; border: none; }
+    .post { background: white; margin: 1em; padding: 1em; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .slideshow img { width: 100%; margin-bottom: 0.5em; border-radius: 5px; }
+    iframe { width: 100%; height: 200px; margin-top: 10px; border-radius: 5px; }
+    .countdown-box { text-align: center; margin-top: 1em; }
+    .countdown-box button { background: #28a745; color: white; border: none; padding: 10px 20px; font-size: 1em; border-radius: 5px; cursor: pointer; }
+    .countdown-box button:disabled { background: #ccc; cursor: not-allowed; }
+  </style></body>
 </html>
